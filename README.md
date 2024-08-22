@@ -221,16 +221,16 @@ EOF
 ### set local route to be advertised by FRR
 ```
 root@ubuntu-frr:~# Prefix1=101.101.101.0/24
-root@ubuntu-frr:~# Device=net1
+root@ubuntu-frr:~# Device=eth0
 
 root@ubuntu-frr:~# sudo ip route add ${Prefix1} dev ${Device}
 
-root@ubuntu-frr:~# ip route show
+root@ubuntu-frr:/# ip route show
 default via 169.254.1.1 dev eth0 
-101.101.101.0/24 dev net1 scope link 
+101.101.101.0/24 dev eth0 scope link 
 169.254.1.1 dev eth0 scope link 
 172.31.96.0/20 dev net1 proto kernel scope link src 172.31.111.240 
-root@ubuntu-frr:~# 
+root@ubuntu-frr:/# 
 ```
 
 ### restart frr
