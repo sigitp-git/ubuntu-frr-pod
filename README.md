@@ -116,7 +116,7 @@ kubectl apply -f https://raw.githubusercontent.com/sigitp-git/ubuntu-frr-pod/mai
 ### example frr vtysh:
 ```
 Admin:~/environment $ kubectl exec -it ubuntu-frr -- bash
-root@ubuntu-frr# cd /etc/frr
+root@ubuntu-frr:~# cd /etc/frr
 root@ubuntu-frr:/etc/frr# pwd
 /etc/frr
 root@ubuntu-frr:/etc/frr# ls -la
