@@ -9,7 +9,7 @@ sudo docker buildx build --platform linux/amd64,linux/arm64 -t 01234567890.dkr.e
 docker system prune --all --force --volumes
 ```
 
-example build output:
+### example build output:
 ```
 Admin:~/environment/ubuntu-frr-dockerfile $ docker system prune --all --force --volumes
 Deleted Images:
@@ -106,4 +106,52 @@ Admin:~/environment/ubuntu-frr-dockerfile $ sudo docker buildx build --platform 
  => => pushing layer acdfb06f9bab                                                                                                                          0.5s
  => => pushing layer afd5aeb140f4                                                                                                                          0.5s
 Admin:~/environment/ubuntu-frr-dockerfile $
+```
+
+### example pod launch:
+
+### example frr vtysh:
+
+```
+Admin:~/environment $ kubectl exec -it ubuntu-frr -- bash
+root@ubuntu-frr# cd /etc/frr
+root@ubuntu-frr:/etc/frr# pwd
+/etc/frr
+root@ubuntu-frr:/etc/frr# ls -la
+total 24
+drwxr-x---. 1 frr  frr    21 Aug 22 19:12 .
+drwxr-xr-x. 1 root root   17 Aug 22 18:33 ..
+-rw-r-----. 1 frr  frr  4129 Aug 22 19:12 daemons
+-rw-r-----. 1 frr  frr   489 Aug  3 06:02 frr.conf
+-rw-r-----. 1 frr  frr  6663 Aug  3 06:02 support_bundle_commands.conf
+-rw-r-----. 1 frr  frr    32 Aug  3 06:02 vtysh.conf
+
+# enable bgpd and bfdd daemons by editing daemons file
+root@ubuntu-frr:/etc/frr# vim daemons
+bgpd=yes
+bfdd=no
+
+# start frr
+root@ubuntu-frr:/etc/frr# service frr start
+ * Starting watchfrr with command: '  /usr/lib/frr/watchfrr  -d  -F traditional   zebra mgmtd bgpd staticd bfdd'
+ * Started watchfrr
+root@ubuntu-frr:/etc/frr# vtysh
+
+Hello, this is FRRouting (version 10.1).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+ubuntu-frr# show run
+Building configuration...
+
+Current configuration:
+!
+frr version 10.1
+frr defaults traditional
+hostname ubuntu-frr
+log syslog informational
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+end
+ubuntu-frr# 
 ```
