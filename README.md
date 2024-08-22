@@ -232,3 +232,78 @@ default via 169.254.1.1 dev eth0
 172.31.96.0/20 dev net1 proto kernel scope link src 172.31.111.240 
 root@ubuntu-frr:~# 
 ```
+
+### restart frr
+```
+root@ubuntu-frr:~# service frr restart
+ * Stopped watchfrr
+ * Stopped staticd
+ * Stopped bgpd
+ * Stopped mgmtd
+ * Stopped bfdd
+ * Stopped zebra
+ * Starting watchfrr with command: '  /usr/lib/frr/watchfrr  -d  -F traditional   zebra mgmtd bgpd staticd bfdd'
+ * Started watchfrr
+root@ubuntu-frr:~#
+
+root@ubuntu-frr:~# vtysh 
+
+Hello, this is FRRouting (version 10.1).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+ubuntu-frr# show run
+Building configuration...
+
+Current configuration:
+!
+frr version 10.1
+frr defaults traditional
+hostname ubuntu-frr
+log syslog
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+debug bgp neighbor-events
+debug bgp updates in
+debug bgp updates out
+debug bgp zebra
+debug bgp bfd
+debug bfd distributed
+debug bfd peer
+debug bfd zebra
+debug bfd network
+!
+router bgp 65001
+ bgp router-id 172.31.147.205
+ no bgp default ipv4-unicast
+ neighbor 172.31.201.21 remote-as 65000
+ neighbor 172.31.201.21 bfd
+ neighbor 172.31.201.21 disable-connected-check
+ neighbor 172.31.202.115 remote-as 65000
+ neighbor 172.31.202.115 bfd
+ neighbor 172.31.202.115 disable-connected-check
+ !
+ address-family ipv4 unicast
+  network 101.101.101.0/24
+  neighbor 172.31.201.21 activate
+  neighbor 172.31.201.21 route-map OUTBOUND out
+  neighbor 172.31.202.115 activate
+  neighbor 172.31.202.115 route-map OUTBOUND out
+ exit-address-family
+exit
+!
+route-map OUTBOUND permit 10
+exit
+!
+bfd
+ peer 172.31.201.21
+ exit
+ !
+ peer 172.31.202.115
+ exit
+ !
+exit
+!
+end
+ubuntu-frr# 
+```
