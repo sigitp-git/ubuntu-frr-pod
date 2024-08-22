@@ -155,3 +155,63 @@ service integrated-vtysh-config
 end
 ubuntu-frr# 
 ```
+
+### example frr config:
+```
+export RtrAsn=65000
+export FrrAsn=65001
+export FrrIp=172.31.150.218
+export Rtr1Ip=172.31.201.21
+export Rtr2Ip=172.31.202.115
+export Prefix1=101.101.101.0/24
+
+sudo -E tee /etc/frr/frr.conf > /dev/null <<EOF 
+!
+frr version 9.1
+frr defaults traditional
+hostname frr-vpc-rs-test-router
+log syslog debug
+no ipv6 forwarding
+!
+debug bgp neighbor-events
+debug bgp updates in
+debug bgp updates out
+debug bgp zebra
+debug bgp bfd
+debug bfd distributed
+debug bfd peer
+debug bfd zebra
+debug bfd network
+!
+router bgp ${FrrAsn}
+bgp router-id ${FrrIp}
+no bgp default ipv4-unicast
+neighbor ${VpcRouteServerEndpoint1Ip} remote-as ${VpcRsAsn}
+neighbor ${VpcRouteServerEndpoint1Ip} bfd
+neighbor ${VpcRouteServerEndpoint1Ip} disable-connected-check
+neighbor ${VpcRouteServerEndpoint2Ip} remote-as ${VpcRsAsn}
+neighbor ${VpcRouteServerEndpoint2Ip} bfd
+neighbor ${VpcRouteServerEndpoint2Ip} disable-connected-check
+!
+address-family ipv4 unicast
+  network ${UePoolPrefix1}
+  neighbor ${VpcRouteServerEndpoint1Ip} activate
+  neighbor ${VpcRouteServerEndpoint1Ip} route-map OUTBOUND out
+  neighbor ${VpcRouteServerEndpoint2Ip} activate
+  neighbor ${VpcRouteServerEndpoint2Ip} route-map OUTBOUND out
+exit-address-family
+exit
+!
+route-map OUTBOUND permit 10
+exit
+!
+bfd
+peer ${VpcRouteServerEndpoint1Ip}
+peer ${VpcRouteServerEndpoint2Ip}
+exit
+!
+exit
+!
+end
+EOF
+```
