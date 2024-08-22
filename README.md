@@ -108,10 +108,12 @@ Admin:~/environment/ubuntu-frr-dockerfile $ sudo docker buildx build --platform 
 Admin:~/environment/ubuntu-frr-dockerfile $
 ```
 
-### example pod launch:
+### example pod launch on Kubernetes cluster:
+```
+kubectl apply -f https://raw.githubusercontent.com/sigitp-git/ubuntu-frr-pod/main/ubuntu-frr-pod.yaml
+```
 
 ### example frr vtysh:
-
 ```
 Admin:~/environment $ kubectl exec -it ubuntu-frr -- bash
 root@ubuntu-frr# cd /etc/frr
@@ -160,7 +162,7 @@ ubuntu-frr#
 ```
 export RtrAsn=65000
 export FrrAsn=65001
-export FrrIp=172.31.150.218
+export FrrIp=172.31.147.205
 export Rtr1Ip=172.31.201.21
 export Rtr2Ip=172.31.202.115
 export Prefix1=101.101.101.0/24
@@ -186,19 +188,19 @@ debug bfd network
 router bgp ${FrrAsn}
 bgp router-id ${FrrIp}
 no bgp default ipv4-unicast
-neighbor ${VpcRouteServerEndpoint1Ip} remote-as ${VpcRsAsn}
-neighbor ${VpcRouteServerEndpoint1Ip} bfd
-neighbor ${VpcRouteServerEndpoint1Ip} disable-connected-check
-neighbor ${VpcRouteServerEndpoint2Ip} remote-as ${VpcRsAsn}
-neighbor ${VpcRouteServerEndpoint2Ip} bfd
-neighbor ${VpcRouteServerEndpoint2Ip} disable-connected-check
+neighbor ${Rtr1Ip} remote-as ${RtrAsn}
+neighbor ${Rtr1Ip} bfd
+neighbor ${Rtr1Ip} disable-connected-check
+neighbor ${Rtr2Ip} remote-as ${RtrAsn}
+neighbor ${Rtr2Ip} bfd
+neighbor ${Rtr2Ip} disable-connected-check
 !
 address-family ipv4 unicast
-  network ${UePoolPrefix1}
-  neighbor ${VpcRouteServerEndpoint1Ip} activate
-  neighbor ${VpcRouteServerEndpoint1Ip} route-map OUTBOUND out
-  neighbor ${VpcRouteServerEndpoint2Ip} activate
-  neighbor ${VpcRouteServerEndpoint2Ip} route-map OUTBOUND out
+  network ${Prefix1}
+  neighbor ${Rtr1Ip} activate
+  neighbor ${Rtr1Ip} route-map OUTBOUND out
+  neighbor ${Rtr2Ip} activate
+  neighbor ${Rtr2Ip} route-map OUTBOUND out
 exit-address-family
 exit
 !
@@ -206,8 +208,8 @@ route-map OUTBOUND permit 10
 exit
 !
 bfd
-peer ${VpcRouteServerEndpoint1Ip}
-peer ${VpcRouteServerEndpoint2Ip}
+peer ${Rtr1Ip}
+peer ${Rtr2Ip}
 exit
 !
 exit
