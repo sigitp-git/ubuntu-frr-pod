@@ -305,5 +305,26 @@ bfd
 exit
 !
 end
-ubuntu-frr# 
+ubuntu-frr#
+```
+
+### checking frr status
+```
+root@ubuntu-frr:/# service frr restart
+ * Stopped watchfrr
+ * Stopped staticd
+ * Stopped bgpd
+ * Stopped mgmtd
+ * Stopped bfdd
+ * Stopped zebra
+ * Starting watchfrr with command: '  /usr/lib/frr/watchfrr  -d  -F traditional   zebra mgmtd bgpd staticd bfdd'
+ * Started watchfrr
+root@ubuntu-frr:/# service frr status 
+ * Status of watchfrr: running
+ * Status of zebra: running
+ * Status of mgmtd: running
+ * Status of bgpd: running
+ * Status of staticd: running
+ * Status of bfdd: running
+root@ubuntu-frr:/# 
 ```
