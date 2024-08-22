@@ -217,3 +217,11 @@ exit
 end
 EOF
 ```
+
+### set local route to be advertised by FRR
+```
+Prefix1=101.101.101.0/24
+Device=net1
+
+sudo ip route add ${UePoolPrefix1} dev ${Device}
+```
